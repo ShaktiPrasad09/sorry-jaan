@@ -55,6 +55,7 @@ export class CuteQuestionsComponent {
 
     private dodgeActivated = false;
     private noBtnEl: HTMLElement | null = null;
+    private dodgeContainer: HTMLElement | null = null;
 
     constructor(private renderer: Renderer2) { }
 
@@ -87,36 +88,42 @@ export class CuteQuestionsComponent {
      * Handles hover / touch / click on the "No" button.
      * On the FIRST real interaction only, it:
      *  1. Captures the button's current on-screen position (so the switch is invisible)
-     *  2. Reparents it to <body> — this is essential, because .card has a `transform`
-     *     and .stage has `overflow: hidden`; any transformed ancestor creates a new
-     *     containing block for position:fixed children, which was clipping the button
-     *     instead of letting it roam the full screen.
-     *  3. Switches it to position:fixed
-     * Every call after that just recalculates a new random on-screen spot.
+     *  2. Reparents it to .card-wrap and switches it to position:absolute, so it can
+     *     only roam within the card's own bounds instead of the whole viewport.
+     * Every call after that just recalculates a new random spot within .card-wrap.
      */
     dodgeNoButton(event: Event) {
         event.preventDefault();
         const btn = event.currentTarget as HTMLElement;
 
         if (!this.dodgeActivated) {
-            const rect = btn.getBoundingClientRect();
-            this.renderer.appendChild(document.body, btn);
-            this.renderer.setStyle(btn, 'position', 'fixed');
-            this.renderer.setStyle(btn, 'left', `${rect.left}px`);
-            this.renderer.setStyle(btn, 'top', `${rect.top}px`);
+            const container = btn.closest('.card-wrap') as HTMLElement | null;
+            if (!container) return;
+
+            const btnRect = btn.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            this.renderer.appendChild(container, btn);
+            this.renderer.setStyle(btn, 'position', 'absolute');
+            this.renderer.setStyle(btn, 'left', `${btnRect.left - containerRect.left}px`);
+            this.renderer.setStyle(btn, 'top', `${btnRect.top - containerRect.top}px`);
             this.renderer.setStyle(btn, 'margin', '0');
             this.renderer.setStyle(btn, 'transition', 'left 0.22s ease, top 0.22s ease');
-            this.renderer.setStyle(btn, 'z-index', '9999');
+            this.renderer.setStyle(btn, 'z-index', '20');
             this.dodgeActivated = true;
             this.noBtnEl = btn;
+            this.dodgeContainer = container;
         }
 
+        const container = this.dodgeContainer;
+        if (!container) return;
+
+        const containerRect = container.getBoundingClientRect();
         const w = btn.offsetWidth;
         const h = btn.offsetHeight;
-        const maxX = Math.max(12, window.innerWidth - w - 24);
-        const maxY = Math.max(12, window.innerHeight - h - 24);
-        const x = 12 + Math.random() * (maxX - 12);
-        const y = 12 + Math.random() * (maxY - 12);
+        const maxX = Math.max(0, containerRect.width - w);
+        const maxY = Math.max(0, containerRect.height - h);
+        const x = Math.random() * maxX;
+        const y = Math.random() * maxY;
         this.renderer.setStyle(btn, 'left', `${x}px`);
         this.renderer.setStyle(btn, 'top', `${y}px`);
     }
@@ -126,6 +133,7 @@ export class CuteQuestionsComponent {
             this.noBtnEl.parentNode.removeChild(this.noBtnEl);
         }
         this.noBtnEl = null;
+        this.dodgeContainer = null;
         this.dodgeActivated = false;
     }
 }
