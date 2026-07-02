@@ -18,7 +18,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
-            "baseHref": "/susmita-questions/",
+            "baseHref": "/sorry-jaan/",
             "polyfills": [
               "zone.js"
             ],
