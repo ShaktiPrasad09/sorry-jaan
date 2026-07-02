@@ -3,6 +3,10 @@
         <span *ngFor="let i of fireflyIndices" [style.--i]="i"></span>
     </div>
 
+    <div class="heart-bubbles" aria-hidden="true">
+        <span *ngFor="let i of heartBubbleIndices" [style.--i]="i">&#10084;</span>
+    </div>
+
     <div class="progress" *ngIf="!finished()">
         <div class="progress-fill" [style.width.%]="progress()"></div>
     </div>

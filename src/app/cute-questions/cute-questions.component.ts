@@ -46,6 +46,7 @@ export class CuteQuestionsComponent {
     ];
 
     fireflyIndices = Array.from({ length: 12 }, (_, i) => i + 1);
+    heartBubbleIndices = Array.from({ length: 16 }, (_, i) => i + 1);
 
     currentIndex = signal(0);
     transitioning = signal(false);
