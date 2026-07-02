@@ -1,0 +1,39 @@
+<div class="stage">
+    <div class="fireflies" aria-hidden="true">
+        <span *ngFor="let i of fireflyIndices" [style.--i]="i"></span>
+    </div>
+
+    <div class="progress" *ngIf="!finished()">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <div class="card-wrap" *ngIf="!finished()">
+        <div class="card" [class.leaving]="transitioning()">
+            <p class="eyebrow">question {{ currentIndex() + 1 }} of {{ questions.length }}</p>
+            <h1>{{ currentQuestion()?.text }}</h1>
+
+            <div class="options">
+                <ng-container *ngFor="let opt of currentQuestion()?.options">
+                    <button *ngIf="!(isLastQuestion() && opt === 'No')" class="option-btn" (click)="answer(opt)">
+                        {{ opt }}
+                    </button>
+
+                    <button *ngIf="isLastQuestion() && opt === 'No'" class="option-btn no-btn"
+                        (mouseenter)="dodgeNoButton($event)" (touchstart)="dodgeNoButton($event)"
+                        (click)="dodgeNoButton($event)">
+                        {{ opt }}
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+    <div class="final" *ngIf="finished()">
+        <span class="heart">&#10084;</span>
+        <h1>I'm sorry, Susmita.</h1>
+        <p>
+            Thank you for answering — every single one, even the tough ones.<br />
+            I love you, and I'm going to keep showing you, not just telling you.
+        </p>
+    </div>
+</div>
